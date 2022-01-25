@@ -2,8 +2,9 @@ package server
 
 import (
 	"net"
-	"net/ftp"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type configer interface {
@@ -17,18 +18,26 @@ type fileManager interface {
 }
 
 type Server struct {
-	// cfger configer
-	srv    *ftp.Server
 	strgr  fileManager
 	client *http.Client
 }
 
 func New(cfger configer, strger fileManager) *Server {
+	s := new(Server)
+
 	srv := new(http.Server)
 
 	srv.Addr = net.JoinHostPort(cfger.Host(), cfger.Port())
 
-	return &Server{
-		srv: &http.Server{},
-	}
+	srv.Handler = makeHandler(s)
+
+	return s
+}
+
+func makeHandler(s *Server) http.Handler {
+	r := mux.NewRouter()
+
+	r.HandleFunc("", s.user)
+
+	return r
 }

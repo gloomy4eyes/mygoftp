@@ -1,5 +1,11 @@
 package config
 
+import (
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
+)
+
 type Config struct {
 	host       string
 	port       string
@@ -7,6 +13,9 @@ type Config struct {
 }
 
 func NewFromFile(configFilePath string) *Config {
+	k := koanf.New(".")
+	k.Load(file.Provider(configFilePath), yaml.Parser())
+
 	return &Config{}
 }
 
